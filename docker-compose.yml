@@ -26,7 +26,7 @@ services:
 
   api:
     build:
-      context: ./rentms
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
@@ -36,5 +36,5 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./rentms:/src
+      - ./backend:/src
     restart: on-failure

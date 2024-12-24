@@ -7,9 +7,9 @@ WORKDIR /usr/src/app
 COPY . .
 RUN cargo build --release
 FROM debian:bookworm-slim
-COPY --from=builder /usr/src/app/target/release/rentms /usr/local/bin/rentms
+COPY --from=builder /usr/src/app/target/release/backend /usr/local/bin/backend
 EXPOSE 8080
-CMD ["rentms"]
+CMD ["backend"]
 
 # FROM rust:1.83.0-alpine
 # RUN apk add musl-dev
