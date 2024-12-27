@@ -24,17 +24,17 @@ services:
       start_period: 5s
     restart: on-failure
 
-  api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - rentms_net
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend:/src
-    restart: on-failure
+  # api:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - rentms_net
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - ./backend:/src
+  #   restart: on-failure
