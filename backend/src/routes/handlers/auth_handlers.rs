@@ -1,19 +1,23 @@
-use actix_web::{post,get, web, Responder};
-use crate::utils::app_state;
 use crate::utils::api_response;
-use sea_orm::{Condition, Set,ColumnTrait,EntityTrait,QueryFilter,ActiveModelTrait};
+use crate::utils::api_response::ApiResponse;
+use crate::utils::app_state;
+use crate::utils::jwt;
+use actix_web::{get, post, web, Responder};
 use entity::user::Column;
+use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
+use sha256::digest;
+
 #[derive(serde::Deserialize)]
 struct RegisterModel {
     name: String,
     password: String,
-    email: String
+    email: String,
 }
 
 #[derive(serde::Deserialize)]
 struct LoginModel {
     email: String,
-    password: String
+    password: String,
 }
 
 #[get("/auth")]
@@ -22,46 +26,48 @@ pub async fn hello_user() -> impl Responder {
 }
 
 #[post("/register")]
-pub async fn register(app_state: web::Data<app_state::AppState>, register_json: web::Json<RegisterModel>) -> impl Responder {
+pub async fn register(
+    app_state: web::Data<app_state::AppState>,
+    register_json: web::Json<RegisterModel>,
+) -> Result<ApiResponse, ApiResponse> {
     println!("{}", register_json.name);
     let user_model = entity::user::ActiveModel {
         name: Set(register_json.name.clone()),
         email: Set(register_json.email.clone()),
-        password: Set(register_json.password.clone()),
+        password: Set(digest(register_json.password.clone())),
         ..Default::default()
-    }.insert(&app_state.db).await.unwrap();
-    api_response::ApiResponse::new(200, format!("User {} created successfully", user_model.id).to_string())
-}
+    }
+    .insert(&app_state.db)
+    .await
+    .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
+    Ok(api_response::ApiResponse::new(
+        200,
+        format!("User {} created successfully", user_model.id).to_string(),
+    ))
+}
 
 #[post("/get-user")]
-pub async fn get_user(app_state: web::Data<app_state::AppState>, login_json: web::Json<LoginModel>) -> impl Responder {
-    
-    let user_data = entity::user::Entity::find().filter(
+pub async fn get_user(
+    app_state: web::Data<app_state::AppState>,
+    login_json: web::Json<LoginModel>,
+) -> Result<ApiResponse, ApiResponse> {
+    let user_data = entity::user::Entity::find()
+        .filter(
             Condition::all()
-            .add(Column::Email.eq(&login_json.email))
-            .add(Column::Password.eq(&login_json.password))
-            ).one(&app_state.db).await.unwrap();
-            
-    if user_data.is_none() {
-        return api_response::ApiResponse::new(400, "User not found".to_string());
-    }
-    api_response::ApiResponse::new(200, user_data.unwrap().name.to_string())
+                .add(Column::Email.eq(&login_json.email))
+                .add(Column::Password.eq(digest(&login_json.password))),
+        )
+        .one(&app_state.db)
+        .await
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?
+        .ok_or(ApiResponse::new(404, "User Not Found".to_string()))?;
+
+    let token: String = jwt::encode_jwt(user_data.email, user_data.id)
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+
+    Ok(api_response::ApiResponse::new(
+        200,
+        format!("{{'token':'{}'}}", token),
+    ))
 }
-
-
-// #[post("/login")]
-// pub async fn login(app_state: web::Data<app_state::AppState>, login_json: web::Json<LoginModel>) -> impl Responder {
-    
-//     let user_data = entity::user::Entity::find().filter(
-//             Condition::all()
-//             .add(entity::user::Column::Email.eq(&login_json.email))
-//             .add(entity::user::Column::Password.eq(&login_json.password))
-//             ).one(&app_state.db).await.unwrap();
-//     if user_data.is_none() {
-//         return api_response::ApiResponse::new(400, "User not found".to_string());
-//     }
-//     api_response::ApiResponse::new(200, user.unwrap().name.to_string())
-// }
-
-
