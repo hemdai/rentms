@@ -20,3 +20,13 @@ sha256 = "^1"
 chrono = "0.4.39"
 jsonwebtoken = "9.3.0"
 actix-web-lab = "0.23.0"
+actix-multipart = "0.7.2"
+sanitize-filename = "0.6.0"
+
+[dependencies.uuid]
+version = "1.11.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]

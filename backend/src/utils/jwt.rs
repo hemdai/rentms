@@ -7,8 +7,6 @@ use jsonwebtoken::{decode, encode, Header, Validation};
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use serde::{Deserialize, Serialize};
 
-use super::api_response::ApiResponse;
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub email: String,
