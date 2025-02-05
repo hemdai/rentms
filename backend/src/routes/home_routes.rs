@@ -2,7 +2,7 @@ use actix_web::web;
 
 use super::handlers;
 
-pub fn config(config: &mut web::ServiceConfig) {
+pub fn config_config(config: &mut web::ServiceConfig) {
     config.service(
         web::scope("/api/v1")
             .service(handlers::home_handlers::great)
