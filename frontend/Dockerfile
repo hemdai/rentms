@@ -1,10 +1,10 @@
-FROM node:16-alpine as build-stage
+FROM node:20 as build-stage
 WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 RUN npm install
 COPY . .
-EXPOSE 3030
+EXPOSE 3000
 
 #Staging
 FROM build-stage as rentms-frontend-staging-stage
