@@ -33,7 +33,8 @@ const ConversationDetail = () => {
 
                 <CustomButton
                     label="Send"
-                    onClick={()=>console.log("Clicked")}
+                    onClick={() => console.log("Clicked")}
+                    className=""
                 />
                 
             </div>
