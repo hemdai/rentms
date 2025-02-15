@@ -11,6 +11,10 @@ pub struct Model {
     #[sea_orm(unique)]
     pub email: String,
     pub password: String,
+    pub avatar: String,
+    pub is_active: bool,
+    pub is_superuser: bool,
+    pub is_staff: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
