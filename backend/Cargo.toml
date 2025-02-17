@@ -22,6 +22,7 @@ jsonwebtoken = "9.3.0"
 actix-web-lab = "0.23.0"
 actix-multipart = "0.7.2"
 sanitize-filename = "0.6.0"
+actix-cors = "0.7.0"
 
 [dependencies.uuid]
 version = "1.11.0"

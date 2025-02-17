@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use migration::{Migrator, MigratorTrait};
@@ -30,7 +31,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(app_state.clone())
             .wrap(Logger::default())
-            .configure(routes::home_routes::config)
+            .wrap(
+                Cors::default()
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin()
+                    .max_age(36500),
+            )
+            .configure(routes::home_routes::config_home)
             .configure(routes::auth_routes::config_auth)
             .configure(routes::user_routes::config_users)
             .configure(routes::post_routes::config_posts)

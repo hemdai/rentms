@@ -7,6 +7,7 @@ lazy_static! {
     pub static ref DATABASE_URL: String = get_db_url();
     pub static ref SECRET_KEY: String = get_secret_key();
     pub static ref MAX_FILE_SIZE: u64 = get_max_file_size();
+    pub static ref ACCOUNT_AUTHENTICATION_METHOD: String = get_account_authentication_method();
 }
 
 fn set_address() -> String {
@@ -38,4 +39,9 @@ fn get_max_file_size() -> u64 {
         .unwrap_or("10485760".to_owned())
         .parse::<u64>()
         .expect("Can't parse the port")
+}
+
+fn get_account_authentication_method() -> String {
+    dotenv::dotenv().ok();
+    env::var("ACCOUNT_AUTHENTICATION_METHOD").unwrap_or("email".to_string())
 }

@@ -1,4 +1,3 @@
-use std::default;
 use std::path::PathBuf;
 
 use crate::utils;
@@ -6,9 +5,7 @@ use crate::utils::{api_response::ApiResponse, app_state, jwt::Claims};
 use actix_multipart::form::tempfile::TempFile;
 use actix_multipart::form::text::Text;
 use actix_multipart::form::MultipartForm;
-use actix_web::web::post;
 use actix_web::{get, post, web};
-use actix_web_lab::util;
 use chrono::NaiveDateTime;
 use chrono::Utc;
 use sea_orm::ColumnTrait;
@@ -102,14 +99,26 @@ pub async fn create_post(
 
     match std::fs::copy(temp_file_path, file_path) {
         Ok(_) => {
-        created_entity.image = Set(some_file_name);
-        created_entity.save(&txn)    
-        Ok(ApiResponse::new(200, "Post Created".to_owned())),
-        Err(_) => {}
-    }
-    }
+            created_entity.image = Set(new_file_name);
+            created_entity
+                .save(&txn)
+                .await
+                .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+            txn.commit()
+                .await
+                .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
-    Ok(ApiResponse::new(200, "Post Created".to_string()))
+            std::fs::remove_file(temp_file_path).unwrap_or_default();
+
+            Ok(ApiResponse::new(200, "Post Created".to_owned()))
+        }
+        Err(_) => {
+            txn.rollback()
+                .await
+                .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+            Err(ApiResponse::new(500, "Internal Server Error".to_owned()))
+        }
+    }
 }
 
 #[get("my-posts")]
