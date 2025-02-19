@@ -2,5 +2,8 @@
 
 pub mod prelude;
 
+pub mod address;
+pub mod country;
 pub mod post;
+pub mod property;
 pub mod user;

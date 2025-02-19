@@ -15,17 +15,40 @@ pub struct Model {
     pub is_active: bool,
     pub is_superuser: bool,
     pub is_staff: bool,
+    pub address_id: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::address::Entity",
+        from = "Column::AddressId",
+        to = "super::address::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    Address,
     #[sea_orm(has_many = "super::post::Entity")]
     Post,
+    #[sea_orm(has_many = "super::property::Entity")]
+    Property,
+}
+
+impl Related<super::address::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Address.def()
+    }
 }
 
 impl Related<super::post::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Post.def()
+    }
+}
+
+impl Related<super::property::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Property.def()
     }
 }
 
