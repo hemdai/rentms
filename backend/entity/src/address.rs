@@ -23,6 +23,8 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Country,
+    #[sea_orm(has_many = "super::property::Entity")]
+    Property,
     #[sea_orm(has_many = "super::user::Entity")]
     User,
 }
@@ -30,6 +32,12 @@ pub enum Relation {
 impl Related<super::country::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Country.def()
+    }
+}
+
+impl Related<super::property::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Property.def()
     }
 }
 

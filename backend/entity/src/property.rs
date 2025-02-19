@@ -14,10 +14,22 @@ pub struct Model {
     pub bedroom: i32,
     pub bathroom: i32,
     pub guest: i32,
+    pub address_id: Option<i32>,
+    pub category: Option<String>,
+    pub image: Option<String>,
+    pub created_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::address::Entity",
+        from = "Column::AddressId",
+        to = "super::address::Column::Id",
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    Address,
     #[sea_orm(
         belongs_to = "super::user::Entity",
         from = "Column::UserId",
@@ -26,6 +38,12 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     User,
+}
+
+impl Related<super::address::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Address.def()
+    }
 }
 
 impl Related<super::user::Entity> for Entity {
