@@ -5,6 +5,7 @@ use migration::{Migrator, MigratorTrait};
 use sea_orm::Database;
 use sea_orm::DatabaseConnection;
 use utils::app_state::AppState;
+mod models;
 mod routes;
 mod utils;
 
@@ -42,6 +43,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::auth_routes::config_auth)
             .configure(routes::user_routes::config_users)
             .configure(routes::post_routes::config_posts)
+            .configure(routes::property_routes::config_property)
     })
     .bind((address, port))?
     .run()
