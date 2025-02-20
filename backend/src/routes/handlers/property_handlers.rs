@@ -1,6 +1,8 @@
 use crate::models::property_model::{CreatePropertyModel, PropertyModel};
 use crate::utils::{api_response::ApiResponse, app_state, jwt::Claims};
 use actix_web::{get, post, web};
+use chrono::Utc;
+use chrono::{DateTime, NaiveDateTime};
 use sea_orm::{EntityTrait, Set};
 use uuid::Uuid;
 
@@ -41,13 +43,22 @@ pub async fn get_all_property(
 pub async fn create_property(
     app_state: web::Data<app_state::AppState>,
     claim: Claims,
-    create_property_model: CreatePropertyModel,
+    property_model: CreatePropertyModel,
 ) -> Result<ApiResponse, ApiResponse> {
+    let time_created: Option<NaiveDateTime> = Some(Utc::now().naive_local());
     let propety_entity = entity::property::ActiveModel {
         id: Set(Uuid::new_v4()),
-        title: Set(create_property_model.title.clone()),
-        description: Set(create_property_model.description.clone()),
-        price_per_night: Set(create_property_model.price_per_night.clone()),
+        title: Set(property_model.title.clone()),
+        description: Set(property_model.description.clone()),
+        price_per_night: Set(property_model.price_per_night.clone()),
+        bathroom: Set(property_model.bathroom.clone()),
+        bedroom: Set(property_model.bathroom.clone()),
+        address_id: Set(property_model.address_id.clone()),
+        category: Set(property_model.category.clone()),
+        guest: Set(property_model.guest.clone()),
+        user_id: Set(1),
+        image: Set(property_model.image.clone()),
+        created_at: Set(time_created),
     };
     Ok(ApiResponse::new(200, "".to_string()))
 }
