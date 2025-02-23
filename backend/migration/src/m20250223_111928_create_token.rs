@@ -1,3 +1,4 @@
+use crate::m20241226_151835_create_user_table::User;
 use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
@@ -6,36 +7,39 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
             .create_table(
                 Table::create()
-                    .table(Post::Table)
+                    .table(Token::Table)
                     .if_not_exists()
-                    .col(pk_auto(Post::Id))
-                    .col(string(Post::Title))
-                    .col(string(Post::Text))
+                    .col(pk_auto(Token::Id))
+                    .col(string(Token::Key))
+                    .col(date_time(Token::CreatedAt).date_time().not_null())
+                    .col(integer(Token::UserId).integer().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("token_use_id")
+                            .from(Token::Table, Token::UserId)
+                            .to(User::Table, User::Id)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
                     .to_owned(),
             )
             .await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
-            .drop_table(Table::drop().table(Post::Table).to_owned())
+            .drop_table(Table::drop().table(Token::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-enum Post {
+enum Token {
     Table,
     Id,
-    Title,
-    Text,
+    Key,
+    UserId,
+    CreatedAt,
 }

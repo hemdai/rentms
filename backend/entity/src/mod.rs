@@ -6,4 +6,5 @@ pub mod address;
 pub mod country;
 pub mod post;
 pub mod property;
+pub mod token;
 pub mod user;

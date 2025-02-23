@@ -23,6 +23,10 @@ impl MigratorTrait for Migrator {
             Box::new(m20250213_205220_update_user_image_active::Migration),
             Box::new(m20250219_173314_property_add_address_category_image::Migration),
             Box::new(m20250223_111928_create_token::Migration),
+            Box::new(add_address_in_user::Migration),
+            Box::new(create_address_table::Migration),
+            Box::new(create_country_table::Migration),
+            Box::new(create_property_table::Migration),
         ]
     }
 }

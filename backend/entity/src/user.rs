@@ -32,6 +32,8 @@ pub enum Relation {
     Post,
     #[sea_orm(has_many = "super::property::Entity")]
     Property,
+    #[sea_orm(has_many = "super::token::Entity")]
+    Token,
 }
 
 impl Related<super::address::Entity> for Entity {
@@ -49,6 +51,12 @@ impl Related<super::post::Entity> for Entity {
 impl Related<super::property::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Property.def()
+    }
+}
+
+impl Related<super::token::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Token.def()
     }
 }
 
