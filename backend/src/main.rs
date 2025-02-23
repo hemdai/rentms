@@ -1,6 +1,5 @@
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::web::route;
 use actix_web::{web, App, HttpServer};
 use migration::{Migrator, MigratorTrait};
 use sea_orm::Database;
@@ -46,6 +45,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::post_routes::config_posts)
             .configure(routes::property_routes::config_property)
             .configure(routes::country_routes::config_country)
+            .configure(routes::address_routes::config_address)
     })
     .bind((address, port))?
     .run()

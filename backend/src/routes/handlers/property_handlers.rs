@@ -73,6 +73,9 @@ pub async fn create_property(
         .insert(&txn)
         .await
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+    txn.commit()
+        .await
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
     let serialize_record = serde_json::to_string(&created_entity)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;

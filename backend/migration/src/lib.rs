@@ -9,6 +9,7 @@ mod m20250106_211351_create_post_table;
 mod m20250109_152030_post_created_at_add;
 mod m20250213_205220_update_user_image_active;
 mod m20250219_173314_property_add_address_category_image;
+mod m20250223_111928_create_token;
 
 pub struct Migrator;
 
@@ -21,10 +22,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250109_152030_post_created_at_add::Migration),
             Box::new(m20250213_205220_update_user_image_active::Migration),
             Box::new(m20250219_173314_property_add_address_category_image::Migration),
-            Box::new(create_address_table::Migration),
-            Box::new(create_country_table::Migration),
-            Box::new(create_property_table::Migration),
-            Box::new(add_address_in_user::Migration),
+            Box::new(m20250223_111928_create_token::Migration),
         ]
     }
 }

@@ -1,3 +1,4 @@
+pub mod address_routes;
 pub mod auth_routes;
 pub mod country_routes;
 pub mod handlers;

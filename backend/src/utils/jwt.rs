@@ -32,7 +32,7 @@ impl FromRequest for Claims {
 
 pub fn encode_jwt(email: String, id: i32) -> Result<String, jsonwebtoken::errors::Error> {
     let now = Utc::now();
-    let expire = Duration::hours(1);
+    let expire = Duration::days(30);
     let claims = Claims {
         exp: (now + expire).timestamp() as usize,
         iat: now.timestamp() as usize,
@@ -49,12 +49,20 @@ pub fn encode_jwt(email: String, id: i32) -> Result<String, jsonwebtoken::errors
     .unwrap();
     Ok(token)
 }
-pub fn decode_jwt(token: String) -> Result<Claims, jsonwebtoken::errors::Error> {
+
+pub fn decode_jwt(token: String) -> Result<Claims, String> {
     let secret = constants::SECRET_KEY.clone();
-    let token_data = decode(
+    match decode::<Claims>(
         &token,
         &DecodingKey::from_secret(secret.as_ref()),
         &Validation::default(),
-    );
-    Ok(token_data.unwrap().claims)
+    ) {
+        Ok(token_data) => Ok(token_data.claims),
+        Err(err) => match err.kind() {
+            jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
+                Err("Token has expired".to_string())
+            }
+            _ => Err(format!("Invalid token: {}", err)),
+        },
+    }
 }
