@@ -31,3 +31,19 @@ impl Related<super::user::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+// impl Entity {
+//     pub async fn is_valid(key: &str, db: &DatabaseConnection) -> Result<bool, DbErr> {
+//         let key = Self::find().filter(Column::Key.eq(key)).one(db).await?;
+
+//         match key {
+//             Some(k) => {
+//                 let created_at_utc =
+//                     ChroDateTime::<Utc>::from_naive_utc_and_offset(k.created_at, Utc);
+//                 let age = Utc::now() - created_at_utc;
+//                 Ok(age <= Duration::days(30))
+//             }
+//             None => Ok(false),
+//         }
+//     }
+// }

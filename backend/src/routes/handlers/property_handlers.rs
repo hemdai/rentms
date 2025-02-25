@@ -72,12 +72,27 @@ pub async fn create_property(
     let created_entity = propety_entity
         .insert(&txn)
         .await
-        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+        .map_err(|err| ApiResponse::new(500, err.to_string()))
+        .unwrap();
     txn.commit()
         .await
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+    let property_model = PropertyModel {
+        id: created_entity.id,
+        title: created_entity.title,
+        description: created_entity.description,
+        price_per_night: created_entity.price_per_night,
+        guest: created_entity.guest,
+        address_id: created_entity.address_id,
+        category: created_entity.category,
+        image: created_entity.image,
+        created_at: created_entity.created_at,
+        user_id: created_entity.user_id,
+        bedroom: created_entity.bedroom,
+        bathroom: created_entity.bathroom,
+    };
 
-    let serialize_record = serde_json::to_string(&created_entity)
+    let serialize_record = serde_json::to_string(&property_model)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
     Ok(ApiResponse::new(200, serialize_record))

@@ -8,13 +8,17 @@ use utils::app_state::AppState;
 mod models;
 mod routes;
 mod utils;
+// use env_logger::Env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "actix_web=debug");
         env_logger::init();
     }
+
     dotenv::dotenv().ok();
     let address: String = utils::constants::ADDRESS.clone();
     let port: u16 = utils::constants::PORT.clone();

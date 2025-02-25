@@ -1,10 +1,8 @@
-use std::string;
-
 use crate::models;
 use crate::models::country_model::{CountryModel, CreateCountryModel};
 use crate::utils::{api_response::ApiResponse, app_state};
 use actix_web::{get, post, web};
-use sea_orm::sqlx::error;
+use log::{debug, error, info, warn};
 use sea_orm::{ActiveModelTrait, EntityTrait, Set, TransactionTrait};
 
 #[post("/create-country")]
@@ -67,6 +65,5 @@ pub async fn get_all_country(
         .collect();
     let string_result = serde_json::to_string(&all_country)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
-
     Ok(ApiResponse::new(200, string_result.to_owned()))
 }

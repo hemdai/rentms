@@ -3,7 +3,9 @@ use crate::utils::api_response::ApiResponse;
 use crate::utils::app_state;
 use crate::utils::jwt;
 use actix_web::{get, post, web, Responder};
+use chrono::Utc;
 use entity::user::Column;
+use sea_orm::sqlx::error;
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
 use sha256::digest;
 
@@ -66,8 +68,18 @@ pub async fn get_user(
     let token: String = jwt::encode_jwt(user_data.email, user_data.id)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
+    let token_record = entity::token::ActiveModel {
+        key: Set(token.clone()),
+        user_id: Set(user_data.id),
+        created_at: Set(Utc::now().naive_local()),
+        ..Default::default()
+    }
+    .insert(&app_state.db)
+    .await
+    .map_err(|error| ApiResponse::new(500, error.to_string()));
+
     Ok(api_response::ApiResponse::new(
         200,
-        format!("{{'token':'{}'}}", token),
+        format!("{{'token':'{}'}}", token_record.unwrap().key).to_string(),
     ))
 }
