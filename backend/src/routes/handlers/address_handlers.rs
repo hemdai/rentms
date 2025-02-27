@@ -1,3 +1,4 @@
+use crate::models::address_model::AddressResponse;
 use crate::models::address_model::{AddressModel, CreateAddressModel};
 use crate::utils::{api_response::ApiResponse, app_state};
 use actix_web::{get, post, web};
@@ -40,7 +41,7 @@ pub async fn create_address(
 
     let address_entity = entity::address::ActiveModel {
         building_no: Set(address_model.building_no.clone()),
-        country_id: Set(country_model.id.clone()),
+        country_id: Set(country_model.id),
         street: Set(address_model.street.clone()),
         postal_code: Set(address_model.postal_code.clone()),
         ..Default::default()
