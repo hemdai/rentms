@@ -1,4 +1,4 @@
-use crate::create_country_table::Country;
+use crate::m20250224_153031_create_country_table::Country;
 use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]

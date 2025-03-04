@@ -17,10 +17,10 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::country::Entity",
-        from = "Column::Id",
+        from = "Column::CountryId",
         to = "super::country::Column::Id",
         on_update = "NoAction",
-        on_delete = "NoAction"
+        on_delete = "Cascade"
     )]
     Country,
     #[sea_orm(has_many = "super::property::Entity")]

@@ -1,4 +1,4 @@
-use crate::create_address_table::Address;
+use crate::m20250224_153032_create_address_table::Address;
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
