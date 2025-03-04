@@ -14,9 +14,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub email: String,
-    pub exp: usize,
     pub iat: usize,
     pub id: i32,
+    pub sub: String,
+    pub name: String,
+    pub role: String,
+    pub exp: DateTime<Utc>,
+    pub is_valid: bool,
 }
 
 impl FromRequest for Claims {
@@ -33,15 +37,30 @@ impl FromRequest for Claims {
         }
     }
 }
+impl Default for Claims {
+    fn default() -> Self {
+        Claims {
+            email: "".to_string(),
+            iat: 0,
+            sub: "".to_string(),
+            name: "".to_string(),
+            role: "".to_string(),
+            exp: Utc::now(),
+            is_valid: false,
+            id: 0,
+        }
+    }
+}
 
 pub fn encode_jwt(email: String, id: i32) -> Result<String, jsonwebtoken::errors::Error> {
     let now = Utc::now();
     let expire = Duration::days(30);
     let claims = Claims {
-        exp: (now + expire).timestamp() as usize,
+        exp: (now + expire),
         iat: now.timestamp() as usize,
         id,
         email,
+        ..Default::default()
     };
 
     let secret = constants::SECRET_KEY.clone();
@@ -74,7 +93,7 @@ pub fn decode_jwt(token: String) -> Result<Claims, String> {
 pub async fn check_token_in_db(
     token: String,
     app_state: web::Data<app_state::AppState>,
-) -> Result<CustomClaims, ApiResponse> {
+) -> Result<Claims, ApiResponse> {
     let result = entity::token::Entity::find()
         .filter(entity::token::Column::Key.eq(&token))
         .find_also_related(entity::user::Entity)
@@ -86,13 +105,20 @@ pub async fn check_token_in_db(
         Some((token, user)) => {
             // Token found
             let user_name = user
+                .clone()
                 .map(|u| u.name)
+                .unwrap_or_else(|| "Unknown".to_string());
+            let user_email = user
+                .map(|u| u.email)
                 .unwrap_or_else(|| "Unknown".to_string());
             // Use token and user_name as needed
             let created_at_utc = DateTime::<Utc>::from_naive_utc_and_offset(token.created_at, Utc);
             let expiray_date = created_at_utc + Duration::days(30);
             if expiray_date >= Utc::now() {
-                let claim = CustomClaims {
+                let claim = Claims {
+                    email: user_email.to_string(),
+                    iat: token.created_at.timestamp() as usize,
+                    id: token.user_id,
                     sub: token.id.to_string(),
                     name: user_name.clone(),
                     role: "user".to_string(),
@@ -102,9 +128,9 @@ pub async fn check_token_in_db(
                 print!("Token is valid from db the user is {}", user_name);
                 return Ok(claim);
             }
-            return Ok(CustomClaims::default());
+            return Ok(Claims::default());
         }
-        None => return Ok(CustomClaims::default()),
+        None => return Ok(Claims::default()),
     }
 }
 
@@ -115,16 +141,5 @@ pub struct CustomClaims {
     pub role: String,
     pub exp: DateTime<Utc>,
     pub is_valid: bool,
-}
-
-impl Default for CustomClaims {
-    fn default() -> Self {
-        CustomClaims {
-            sub: "".to_string(),
-            name: "".to_string(),
-            role: "".to_string(),
-            exp: Utc::now(),
-            is_valid: false,
-        }
-    }
+    pub id: i32,
 }

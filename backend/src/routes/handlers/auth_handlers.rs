@@ -5,7 +5,6 @@ use crate::utils::jwt;
 use actix_web::{get, post, web, Responder};
 use chrono::Utc;
 use entity::user::Column;
-use sea_orm::sqlx::error;
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
 use sha256::digest;
 
