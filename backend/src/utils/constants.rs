@@ -8,6 +8,7 @@ lazy_static! {
     pub static ref SECRET_KEY: String = get_secret_key();
     pub static ref MAX_FILE_SIZE: u64 = get_max_file_size();
     pub static ref ACCOUNT_AUTHENTICATION_METHOD: String = get_account_authentication_method();
+    pub static ref DOMAIN_URL: String = get_domain_url();
 }
 
 fn set_address() -> String {
@@ -44,4 +45,9 @@ fn get_max_file_size() -> u64 {
 fn get_account_authentication_method() -> String {
     dotenv::dotenv().ok();
     env::var("ACCOUNT_AUTHENTICATION_METHOD").unwrap_or("email".to_string())
+}
+
+fn get_domain_url() -> String {
+    dotenv::dotenv().ok();
+    env::var("DOMAIN_URL").unwrap_or("/".to_string())
 }

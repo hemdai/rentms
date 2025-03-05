@@ -25,6 +25,8 @@ sanitize-filename = "0.6.0"
 actix-cors = "0.7.0"
 tokio = "1.43.0"
 log = "0.4.26"
+futures-util = "0.3"
+
 
 
 [dependencies.uuid]

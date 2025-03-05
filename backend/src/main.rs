@@ -5,8 +5,10 @@ use migration::{Migrator, MigratorTrait};
 use sea_orm::Database;
 use sea_orm::DatabaseConnection;
 use utils::app_state::AppState;
+mod error;
 mod models;
 mod routes;
+mod services;
 mod utils;
 // use env_logger::Env;
 
