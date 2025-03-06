@@ -1,6 +1,11 @@
 use crate::models::property_model::{CreatePropertyModel, PropertyModel};
 use crate::services::file_handler_service::process_image;
-use crate::utils::{api_response::ApiResponse, app_state, jwt::Claims};
+use crate::utils::{
+    api_response::ApiResponse,
+    app_state,
+    constants::{DOMAIN_URL, MEDIA_DIRECTORY},
+    jwt::Claims,
+};
 use actix_multipart::form::MultipartForm;
 use actix_web::{get, post, web};
 use chrono::NaiveDateTime;
@@ -25,7 +30,14 @@ pub async fn get_all_property(
             guest: properti.guest,
             address_id: properti.address_id,
             category: properti.category,
-            image: properti.image,
+            image: Some(
+                format!(
+                    "{}/api/v1/static/images/{}",
+                    DOMAIN_URL.to_string(),
+                    properti.image.unwrap().to_string()
+                )
+                .to_string(),
+            ),
             created_at: properti.created_at,
             user_id: properti.user_id,
             bedroom: properti.bedroom,
@@ -88,7 +100,14 @@ pub async fn create_property(
         guest: created_entity.guest,
         address_id: created_entity.address_id,
         category: created_entity.category,
-        image: created_entity.image,
+        image: Some(
+            format!(
+                "{}/api/v1/static/images/{}",
+                DOMAIN_URL.to_string(),
+                created_entity.image.unwrap().to_string()
+            )
+            .to_string(),
+        ),
         created_at: created_entity.created_at,
         user_id: created_entity.user_id,
         bedroom: created_entity.bedroom,

@@ -24,4 +24,6 @@ Cargo.lock
 .env
 
 # Image files
-.jpg
+*.jpg
+*.jpeg
+*.png

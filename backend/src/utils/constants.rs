@@ -9,6 +9,7 @@ lazy_static! {
     pub static ref MAX_FILE_SIZE: u64 = get_max_file_size();
     pub static ref ACCOUNT_AUTHENTICATION_METHOD: String = get_account_authentication_method();
     pub static ref DOMAIN_URL: String = get_domain_url();
+    pub static ref MEDIA_DIRECTORY: String = get_media_directory();
 }
 
 fn set_address() -> String {
@@ -50,4 +51,9 @@ fn get_account_authentication_method() -> String {
 fn get_domain_url() -> String {
     dotenv::dotenv().ok();
     env::var("DOMAIN_URL").unwrap_or("/".to_string())
+}
+
+fn get_media_directory() -> String {
+    dotenv::dotenv().ok();
+    env::var("MEDIA_DIRECTORY").unwrap_or("media".to_string())
 }
