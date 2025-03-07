@@ -21,8 +21,6 @@ const UserNav: React.FC<UserNavProps> = ({
     const signupModal = useSignupModal();
     const [isOpen, setIsOpen] = useState(false)
 
-    console.log('asdf', userId)
-
     return (
         <div className="p-2 relative inline-block border rounded-full">
             <button 

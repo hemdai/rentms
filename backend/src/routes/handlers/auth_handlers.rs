@@ -5,14 +5,18 @@ use crate::utils::jwt;
 use actix_web::{get, post, web, Responder};
 use chrono::Utc;
 use entity::user::Column;
+use log::{debug, error, info, warn};
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
+use serde::{Deserialize, Serialize};
 use sha256::digest;
+use std::fmt::Debug;
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
 struct RegisterModel {
     name: String,
-    password: String,
     email: String,
+    password1: String,
+    password2: String,
 }
 
 #[derive(serde::Deserialize)]
@@ -25,17 +29,33 @@ struct LoginModel {
 pub async fn hello_user() -> impl Responder {
     api_response::ApiResponse::new(200, "hello Welcome to hello user !".to_string())
 }
-
+#[derive(Serialize, Deserialize)]
+pub struct ErrorMessage {
+    message: String,
+    status: i32,
+}
 #[post("/register")]
 pub async fn register(
     app_state: web::Data<app_state::AppState>,
     register_json: web::Json<RegisterModel>,
 ) -> Result<ApiResponse, ApiResponse> {
-    println!("{}", register_json.name);
+    dbg!(&register_json, "debug log is here");
+    if register_json.password1.clone() != register_json.password2.clone() {
+        let message_obj = ErrorMessage {
+            message: "Password doesn't match".to_string(),
+            status: 400,
+        };
+        let string_message = serde_json::to_string(&message_obj)
+            .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+        return Err(api_response::ApiResponse::new(
+            400,
+            string_message.to_owned(),
+        ));
+    }
     let user_model = entity::user::ActiveModel {
         name: Set(register_json.name.clone()),
         email: Set(register_json.email.clone()),
-        password: Set(digest(register_json.password.clone())),
+        password: Set(digest(register_json.password1.clone())),
         ..Default::default()
     }
     .insert(&app_state.db)

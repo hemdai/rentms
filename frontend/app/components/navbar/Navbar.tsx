@@ -11,7 +11,7 @@ const Navbar = () => {
                     <Link href="/">
                         <Image
                             src="/logo.png"
-                            alt="DjangoBnb logo"
+                            alt="RustBnB logo"
                             width={180}
                             height={38}
                         />
