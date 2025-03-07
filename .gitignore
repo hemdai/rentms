@@ -22,7 +22,7 @@ Cargo.lock
 
 #environment file
 .env
-
+.env.local
 # Image files
 *.jpg
 *.jpeg
