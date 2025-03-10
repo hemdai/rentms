@@ -1,10 +1,14 @@
+use crate::models::token_model::CreateTokenModel;
+use crate::models::token_model::TokenResponse;
 use crate::utils::api_response;
 use crate::utils::api_response::ApiResponse;
 use crate::utils::app_state;
 use crate::utils::jwt;
 use actix_web::{get, post, web, Responder};
 use chrono::Utc;
+use entity::sea_orm_active_enums::TokenTypeEnum;
 use entity::user::Column;
+use futures_util::TryFutureExt;
 use log::{debug, error, info, warn};
 use sea_orm::{ActiveModelTrait, ColumnTrait, Condition, EntityTrait, QueryFilter, Set};
 use serde::{Deserialize, Serialize};
@@ -62,10 +66,22 @@ pub async fn register(
     .await
     .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
-    Ok(api_response::ApiResponse::new(
-        200,
-        format!("User {} created successfully", user_model.id).to_string(),
-    ))
+    let token = jwt::encode_jwt(user_model.email, user_model.id)
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+    let create_token_model = CreateTokenModel {
+        key: token,
+        user_id: user_model.id,
+        token_type: TokenTypeEnum::AccessToken.to_owned(),
+    };
+
+    let token_record = insert_token_to_db(create_token_model, app_state)
+        .await
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+
+    let string_record = serde_json::to_string(&token_record)
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+
+    Ok(api_response::ApiResponse::new(200, string_record))
 }
 
 #[post("/get-user")]
@@ -86,19 +102,43 @@ pub async fn get_user(
 
     let token: String = jwt::encode_jwt(user_data.email, user_data.id)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+    let create_token_model = CreateTokenModel {
+        key: token,
+        user_id: user_data.id,
+        token_type: TokenTypeEnum::AccessToken.to_owned(),
+    };
 
+    let inserted_record = insert_token_to_db(create_token_model, app_state)
+        .await
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+    let string_record = serde_json::to_string(&inserted_record)
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+
+    Ok(api_response::ApiResponse::new(200, string_record))
+}
+
+pub async fn insert_token_to_db(
+    insert_token: CreateTokenModel,
+    app_state: web::Data<app_state::AppState>,
+) -> Result<TokenResponse, String> {
     let token_record = entity::token::ActiveModel {
-        key: Set(token.clone()),
-        user_id: Set(user_data.id),
+        key: Set(insert_token.key.to_string()),
+        user_id: Set(insert_token.user_id),
         created_at: Set(Utc::now().naive_local()),
+        token_type: Set(insert_token.token_type),
         ..Default::default()
     }
     .insert(&app_state.db)
     .await
-    .map_err(|error| ApiResponse::new(500, error.to_string()));
+    .map_err(|error| format!("Couldnot insert Token to DB {}", error.to_string()))
+    .unwrap();
 
-    Ok(api_response::ApiResponse::new(
-        200,
-        format!("{{'token':'{}'}}", token_record.unwrap().key).to_string(),
-    ))
+    let token_response = TokenResponse {
+        id: token_record.id,
+        created_at: token_record.created_at,
+        key: token_record.key,
+        token_type: token_record.token_type,
+        user_id: token_record.user_id,
+    };
+    Ok(token_response)
 }
