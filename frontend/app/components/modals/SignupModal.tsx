@@ -32,8 +32,8 @@ const SignupModal = () => {
             password2: password2
         }
         const response = await apiServices.postWithoutToken('/auth/register', JSON.stringify(formData));
-        if (response.access) {
-            handleLogin(response.user.pk, response.access, response.refresh);
+        if (response.id) {
+            handleLogin(response.id, response.key, response.token_type);
 
             signupModal.close();
 
