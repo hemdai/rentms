@@ -67,6 +67,10 @@ export async function handleLogin(userId: string, accessToken: string, refreshTo
     });
 }
 
+export async function handleLogout() {
+    resetAuthCookies();
+}
+
 export async function resetAuthCookies() {
     cookies().set('session_userid', '');
     cookies().set('session_access_token', '');

@@ -8,6 +8,7 @@ import LogoutButton from "../properties/LogoutButton";
 
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useSignupModal from "@/app/hooks/useSignupModal";
+import logOutModal from "../modals/LogOut";
 
 interface UserNavProps {
     userId?: string | null;
@@ -89,6 +90,13 @@ const UserNav: React.FC<UserNavProps> = ({
                                 onClick={() => {
                                     setIsOpen(false);
                                     signupModal.open();
+                                }}
+                                />
+                            <MenuLink 
+                                label='Log Out'
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    logOutModal.open();
                                 }}
                             />
                         </>
