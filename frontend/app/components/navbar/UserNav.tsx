@@ -8,7 +8,6 @@ import LogoutButton from "../properties/LogoutButton";
 
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useSignupModal from "@/app/hooks/useSignupModal";
-import logOutModal from "../modals/LogOut";
 
 interface UserNavProps {
     userId?: string | null;
@@ -21,6 +20,8 @@ const UserNav: React.FC<UserNavProps> = ({
     const loginModal = useLoginModal();
     const signupModal = useSignupModal();
     const [isOpen, setIsOpen] = useState(false)
+
+    console.log('asdf', userId)
 
     return (
         <div className="p-2 relative inline-block border rounded-full">
@@ -90,13 +91,6 @@ const UserNav: React.FC<UserNavProps> = ({
                                 onClick={() => {
                                     setIsOpen(false);
                                     signupModal.open();
-                                }}
-                                />
-                            <MenuLink 
-                                label='Log Out'
-                                onClick={() => {
-                                    setIsOpen(false);
-                                    logOutModal.open();
                                 }}
                             />
                         </>
