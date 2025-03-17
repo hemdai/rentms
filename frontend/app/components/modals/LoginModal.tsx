@@ -22,7 +22,7 @@ const LoginModal = () => {
             password: password
         }
 
-        const response = await apiServices.post('/api/auth/login/', JSON.stringify(formData))
+        const response = await apiServices.post('/auth/get-user', JSON.stringify(formData))
 
         if (response.id) {
             handleLogin(response.id, response.key, response.token_type);

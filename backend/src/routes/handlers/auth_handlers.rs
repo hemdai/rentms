@@ -97,18 +97,10 @@ pub async fn get_user(
         .map_err(|err| ApiResponse::new(500, err.to_string()))?
         .ok_or(ApiResponse::new(404, "User Not Found".to_string()))?;
 
-    let token: String = jwt::encode_jwt(user_data.email, user_data.id)
-        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
-    let create_token_model = CreateTokenModel {
-        key: token,
-        user_id: user_data.id,
-        token_type: TokenTypeEnum::AccessToken.to_owned(),
-    };
-
-    let inserted_record = user_services::insert_token_to_db(create_token_model, app_state)
+    let token_response = user_services::get_or_create_token(user_data, app_state)
         .await
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
-    let string_record = serde_json::to_string(&inserted_record)
+    let string_record = serde_json::to_string(&token_response)
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
 
     Ok(api_response::ApiResponse::new(200, string_record))

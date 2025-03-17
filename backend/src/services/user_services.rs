@@ -2,18 +2,17 @@ use crate::models::token_model::CreateTokenModel;
 use crate::models::token_model::TokenResponse;
 use crate::utils::app_state;
 use crate::utils::jwt;
-use crate::utils::jwt::Claims;
 use actix_web::web;
 use chrono::Utc;
 use entity::sea_orm_active_enums::TokenTypeEnum;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 
 pub async fn get_or_create_token(
-    claims: Claims,
+    user_record: entity::user::Model,
     app_state: web::Data<app_state::AppState>,
 ) -> Result<TokenResponse, String> {
     let token_record = entity::token::Entity::find()
-        .filter(entity::token::Column::UserId.eq(claims.id))
+        .filter(entity::token::Column::UserId.eq(user_record.id))
         .one(&app_state.db)
         .await
         .map_err(|err| err.to_string())
@@ -30,8 +29,8 @@ pub async fn get_or_create_token(
         None => {
             insert_token_to_db(
                 CreateTokenModel {
-                    key: jwt::encode_jwt(claims.email, claims.id).unwrap(),
-                    user_id: claims.id,
+                    key: jwt::encode_jwt(user_record.email, user_record.id).unwrap(),
+                    user_id: user_record.id,
                     token_type: TokenTypeEnum::AccessToken.to_owned(),
                 },
                 app_state,

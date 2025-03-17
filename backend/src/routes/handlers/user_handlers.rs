@@ -1,4 +1,3 @@
-use crate::error;
 use crate::services::user_services;
 use crate::utils::{api_response::ApiResponse, app_state, jwt::Claims};
 use actix_web::{get, post, web};
@@ -11,13 +10,13 @@ pub async fn login_verify(
     claim_data: Claims,
 ) -> Result<ApiResponse, ApiResponse> {
     //Verify token user
-    entity::user::Entity::find_by_id(claim_data.id)
+    let user_record = entity::user::Entity::find_by_id(claim_data.id)
         .one(&app_state.db)
         .await
         .map_err(|err| ApiResponse::new(500, err.to_string()))?
         .ok_or(ApiResponse::new(404, "User not Found".to_string()))?;
 
-    let token = user_services::get_or_create_token(claim_data, app_state)
+    let token = user_services::get_or_create_token(user_record, app_state)
         .await
         .map_err(|err| ApiResponse::new(500, err.to_string()))?;
     let string_response =
