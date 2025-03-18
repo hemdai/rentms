@@ -2,8 +2,7 @@ use crate::models;
 use crate::models::country_model::{CountryModel, CreateCountryModel};
 use crate::utils::{api_response::ApiResponse, app_state};
 use actix_web::{get, post, web};
-use log::{debug, error, info, warn};
-use sea_orm::{ActiveModelTrait, EntityTrait, Set, TransactionTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set, TransactionTrait};
 
 #[post("/create-country")]
 pub async fn create_country(
@@ -46,24 +45,51 @@ pub async fn create_country(
     Ok(ApiResponse::new(200, string_record.to_owned()))
 }
 
-#[get("/all-country")]
+#[get("/{country_name}")]
 pub async fn get_all_country(
     app_state: web::Data<app_state::AppState>,
+    country_name: web::Path<String>,
 ) -> Result<ApiResponse, ApiResponse> {
-    let all_country: Vec<CountryModel> = entity::country::Entity::find()
-        .all(&app_state.db)
-        .await
-        .map_err(|err| ApiResponse::new(500, err.to_string()))?
-        .into_iter()
-        .map(|country| CountryModel {
-            id: country.id,
-            name: country.name,
-            iso: country.iso,
-            currency: country.currency,
-            phone_code: country.phone_code,
-        })
-        .collect();
-    let string_result = serde_json::to_string(&all_country)
-        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
-    Ok(ApiResponse::new(200, string_result.to_owned()))
+    if country_name.is_empty() {
+        let all_country: Vec<CountryModel> = entity::country::Entity::find()
+            .all(&app_state.db)
+            .await
+            .map_err(|err| ApiResponse::new(500, err.to_string()))?
+            .into_iter()
+            .map(|country| CountryModel {
+                id: country.id,
+                name: country.name,
+                iso: country.iso,
+                currency: country.currency,
+                phone_code: country.phone_code,
+            })
+            .collect();
+        let string_result = serde_json::to_string(&all_country)
+            .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+        Ok(ApiResponse::new(200, string_result.to_owned()))
+    } else {
+        let country_record = entity::country::Entity::find()
+            .filter(entity::country::Column::Name.eq(country_name.to_string()))
+            .one(&app_state.db)
+            .await
+            .map_err(|err| ApiResponse::new(500, err.to_string()))
+            .unwrap();
+        match country_record {
+            None => {
+                return Ok(ApiResponse::new(404, "Country not found".to_string()));
+            }
+            Some(country_record) => {
+                let country_model = models::country_model::CountryModel {
+                    id: country_record.id,
+                    name: country_record.name,
+                    iso: country_record.iso,
+                    currency: country_record.currency,
+                    phone_code: country_record.phone_code,
+                };
+                let string_result = serde_json::to_string(&country_model)
+                    .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+                Ok(ApiResponse::new(200, string_result.to_owned()))
+            }
+        }
+    }
 }
