@@ -9,6 +9,19 @@ pub async fn create_country(
     app_state: web::Data<app_state::AppState>,
     country_model: web::Json<CreateCountryModel>,
 ) -> Result<ApiResponse, ApiResponse> {
+    let check_if_exist = entity::country::Entity::find()
+        .filter(entity::country::Column::Name.eq(country_model.name.clone()))
+        .one(&app_state.db)
+        .await
+        .map_err(|err| ApiResponse::new(500, err.to_string()))?;
+
+    if check_if_exist.is_some() {
+        return Err(ApiResponse::new(
+            400,
+            "Country name already exist".to_string(),
+        ));
+    }
+
     let txn = app_state
         .db
         .begin()

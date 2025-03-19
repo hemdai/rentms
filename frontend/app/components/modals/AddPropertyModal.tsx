@@ -9,8 +9,6 @@ import Categories from "../addproperty/Categories";
 import SelectCountry, { SelectCountryValue } from "../forms/SelectCountry";
 import apiServices from "@/app/services/apiServices";
 import { useRouter } from "next/navigation";
-import { json } from "stream/consumers";
-
 const AddPropertyModal = () => {
     // States
     const [currentStep, setCurrentStep] = useState(1);
@@ -71,6 +69,10 @@ const AddPropertyModal = () => {
             }
         } console.log("Error on adding address")
     }
+
+    
+
+ 
     // Submit Form
     const submitForm = async () => {
         console.log('submitForm');
