@@ -14,13 +14,18 @@ RentMS is a powerful, ongoing **renting management system**, designed to functio
 
 This project is currently **under active development**. Future improvements include enhancing real-time communication with a **message broker system** and refining the overall experience for users.
 
-## 🎯 Features (In Progress)
+## 🎯 Features (Done)
 
 - 🔹 **Property Listings** – List and manage rental properties with ease.
 - 🔹 **User Authentication** – Secure login and signup system.
 - 🔹 **Booking System** – Users can book and manage reservations.
-- 🔹 **Payments** – Integration for secure online transactions.
+- 🔹 **Property Creation** – Creation of property over the address of world.
 - 🔹 **Containerized Deployment** – Fully Dockerized for easy scaling.
+- 🔹 **Owoner's Space** – Make management of your property.
+
+## ⚙️ Features (Upcomming)
+
+- 🔹 **Payments** – Integration for secure online transactions.
 - 🔹 **Real-time Messaging (Upcoming)** – Message broker for better communication.
 
 ## 📦 Setup & Installation
@@ -39,23 +44,15 @@ This project is currently **under active development**. Future improvements incl
    cd rentms/backend
    ```
 
-3. **Start Backend (Rust)** While in development it is detached with docker but docker has configuration for it just disabme comment and run docker-compose up --build
+3. **Start Backend (Rust)** While in development it is detached with docker but docker has configuration for it just disable comment and run docker-compose up --build
 
    ```sh
    cargo run
    ```
 
-4. **Start Frontend (Next.js)**
-
+4. **Start Frontend (Next.js) and PostgreSQL**
    ```sh
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-5. **Run PostgreSQL (Docker)**
-   ```sh
-   docker-compose up -d
+   docker-compose up --build
    ```
 
 ## 🛠️ Contribution
